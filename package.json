@@ -1,0 +1,28 @@
+{
+  "name": "bbmodules-backend",
+  "version": "0.1.0",
+  "description": "A place to store modules for the BattleBit Modular API",
+  "main": "index.mjs",
+  "type": "module",
+  "scripts": {
+    "test": "nodemon"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BattleBit-Community-Servers/BBModules-Backend.git"
+  },
+  "author": "Mevng / goat, DasIschBims / Bims, RainOrigami",
+  "license": "WTFPL",
+  "bugs": {
+    "url": "https://github.com/BattleBit-Community-Servers/BBModules-Backend/issues"
+  },
+  "homepage": "https://github.com/BattleBit-Community-Servers/BBModules-Backend#readme",
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-session": "^1.17.3",
+    "mysql2": "^3.6.0",
+    "passport": "^0.6.0",
+    "passport-discord": "^0.1.4"
+  }
+}
