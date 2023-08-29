@@ -1,3 +1,5 @@
+
+import 'dotenv/config';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import passport from 'passport';
@@ -14,5 +16,5 @@ const func = passport.authenticate('discord', {
 const type = "GET";
 const url = "/discord/callback";
 const auth = false;
-
-export {func , type, url, auth };
+const role = 9999;
+export { func , type, url, auth, role };

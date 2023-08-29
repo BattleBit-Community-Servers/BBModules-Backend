@@ -15,4 +15,5 @@ const func = async (req, res) => {
 const type = "GET";
 const url = '/GetAllUsers';
 const auth = true;
-export { func , type, url, auth };
+const role = 9999;
+export { func , type, url, auth, role };

@@ -24,8 +24,8 @@ async function importPages(dir) {
       //console.log(filePath)
       const page = await import(filePath); // FIRST TODO / PATCH 4 LATER COMMENT !! @future me, remove `"file://"+` to make it work on linux
       const url = filePath.split("/routes")[1].split("/").slice(0, -1).join("/")+page.url;
-      if (page.type === 'GET') WebsiteRouter.get(url, authMiddleware(page.auth), page.func);
-      else if (page.type === 'POST') WebsiteRouter.post(url, authMiddleware(page.auth), page.func);
+      if (page.type === 'GET') WebsiteRouter.get(url, authMiddleware(page.auth, page.role), page.func);
+      else if (page.type === 'POST') WebsiteRouter.post(url, authMiddleware(page.auth, page.role), page.func);
       console.log('+ ' + filePath.split('/').pop() + ' ' + page.type + ' ' + url);
     }
   }

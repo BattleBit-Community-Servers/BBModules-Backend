@@ -1,5 +1,6 @@
 // server.mjs
-import 'dotenv/config'
+
+import 'dotenv/config';
 
 // Express related
 import express from 'express';
@@ -13,7 +14,13 @@ import './DiscordStrategy.mjs'
 // Router
 import { WebsiteRouter, loadPages } from './routers/WebsiteRouter.mjs'; 
 
+// Prisma DB
 import prisma from './database/Prisma.mjs';
+
+
+// Swagger
+import swaggerUi from 'swagger-ui-express';
+import swaggerSpec from './swagger.mjs';
 
 const app = express();
 const PORT = process.env.PORT || 2565;
@@ -36,6 +43,8 @@ const startServer = async () => {
 
     loadPages();
     app.use('/', WebsiteRouter);
+
+    app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
     app.use(express.static('public'));
     
