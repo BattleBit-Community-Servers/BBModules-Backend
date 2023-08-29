@@ -1,0 +1,69 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model dependencies {
+  Dependency_id          Int                          @id @default(autoincrement())
+  Dependency_version_id  Int?                         @unique(map: "Dependency_version_id")
+  Dependency_type        dependencies_Dependency_type
+  Dependency_binary_text String?                      @db.Text
+  Dependency_created_at  DateTime?                    @default(now()) @db.Timestamp(0)
+  versions               versions?                    @relation(fields: [Dependency_version_id], references: [Version_id], onDelete: Restrict, onUpdate: Restrict, map: "dependencies_ibfk_1")
+}
+
+model modules {
+  Module_id         Int        @id @default(autoincrement())
+  Module_name       String     @unique(map: "Module_name") @db.VarChar(255)
+  Module_author_id  Int?
+  Module_downloads  Int?       @default(0)
+  Module_shortdesc  String?    @db.Text
+  Module_markdown   String?    @db.Text
+  Module_created_at DateTime?  @default(now()) @db.Timestamp(0)
+  Module_updated_at DateTime?  @default(now()) @db.Timestamp(0)
+  users             users?     @relation(fields: [Module_author_id], references: [User_id], onDelete: Restrict, onUpdate: Restrict, map: "modules_ibfk_1")
+  versions          versions[]
+
+  @@index([Module_author_id], map: "Module_author_id")
+}
+
+model users {
+  User_id                    Int       @id @default(autoincrement())
+  User_roles                 String    @default("user") @db.LongText
+  User_displayname           String?   @db.VarChar(255)
+  User_email                 String    @db.VarChar(255)
+  User_is_banned             Boolean?  @default(false)
+  User_is_locked             Boolean?  @default(false)
+  User_discord_id            BigInt?   @unique(map: "User_discord_id")
+  User_discord_username      String?   @db.VarChar(255)
+  User_discord_guilds        Json?     @db.Json
+  User_discord_access_token  String?   @db.VarChar(255)
+  User_discord_refresh_token String?   @db.VarChar(255)
+  User_discord_issued_token  DateTime? @default(now()) @db.Timestamp(0)
+  User_created_at            DateTime? @default(now()) @db.Timestamp(0)
+  User_updated_at            DateTime? @default(now()) @db.Timestamp(0)
+  modules                    modules[]
+}
+
+model versions {
+  Version_id         Int           @id @default(autoincrement())
+  Version_module_id  Int?
+  Version_v_number   String        @db.VarChar(20)
+  Version_file_path  String?       @db.VarChar(255)
+  Version_approved   Boolean?      @default(false)
+  Version_created_at DateTime?     @default(now()) @db.Timestamp(0)
+  dependencies       dependencies?
+  modules            modules?      @relation(fields: [Version_module_id], references: [Module_id], onDelete: Restrict, onUpdate: Restrict, map: "versions_ibfk_1")
+
+  @@index([Version_module_id], map: "Version_module_id")
+}
+
+enum dependencies_Dependency_type {
+  optional
+  required
+  binary
+}
