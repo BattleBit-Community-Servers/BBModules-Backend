@@ -72,5 +72,4 @@ const createDB = async () => {
   }
 };
 
-// Call the setup function to initialize tables
 export { createDB };
