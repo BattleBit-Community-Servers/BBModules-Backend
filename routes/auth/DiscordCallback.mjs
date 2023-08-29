@@ -12,7 +12,7 @@ const func = passport.authenticate('discord', {
 });
 
 const type = "GET";
-const url = "/auth/discord/callback";
+const url = "/discord/callback";
 const auth = false;
 
 export {func , type, url, auth };

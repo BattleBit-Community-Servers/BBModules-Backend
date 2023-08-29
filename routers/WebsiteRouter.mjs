@@ -21,10 +21,12 @@ async function importPages(dir) {
     if (stat.isDirectory()) {
       await importPages(filePath);
     } else if (file.endsWith('.mjs')) {
-      const page = await import("file://"+filePath); // FIRST TODO / PATCH 4 LATER COMMENT !! @future me, remove `"file://"+` to make it work on linux
-      if (page.type === 'GET') WebsiteRouter.get(page.url, authMiddleware(page.auth), page.func);
-      else if (page.type === 'POST') WebsiteRouter.post(page.url, authMiddleware(page.auth), page.func);
-      console.log('+ ' + filePath.split('/').pop() + ' ' + page.type + ' ' + page.url);
+      //console.log(filePath)
+      const page = await import(filePath); // FIRST TODO / PATCH 4 LATER COMMENT !! @future me, remove `"file://"+` to make it work on linux
+      const url = filePath.split("/routes")[1].split("/").slice(0, -1).join("/")+page.url;
+      if (page.type === 'GET') WebsiteRouter.get(url, authMiddleware(page.auth), page.func);
+      else if (page.type === 'POST') WebsiteRouter.post(url, authMiddleware(page.auth), page.func);
+      console.log('+ ' + filePath.split('/').pop() + ' ' + page.type + ' ' + url);
     }
   }
 }
