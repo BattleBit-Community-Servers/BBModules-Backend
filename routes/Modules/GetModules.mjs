@@ -9,6 +9,7 @@ const func = async (req, res) => {
       select: {
         Module_id: true,
         Module_name: true,
+        Module_shortdesc: true,
         Module_downloads: true,
         users: {
           select: {
@@ -17,13 +18,12 @@ const func = async (req, res) => {
         },
         versions: {
           select: {
-            Version_v_number: {
-              orderBy: {
-                Version_v_number: 'desc',
-              },
-              take: 1,
-            },
+            Version_v_number: true,
           },
+          orderBy: {
+            Version_v_number: 'desc',
+          },
+          take: 1,
         },
       },
     });
