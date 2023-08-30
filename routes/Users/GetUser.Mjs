@@ -37,7 +37,7 @@ const func = async (req, res) => {
     const id = req.params.id;
     const user = await prisma.users.findFirst({
       where: {
-        User_discord_id: BigInt(id),
+        User_discord_id: id,
       },
     });
     res.status(200).json(user);
@@ -47,8 +47,11 @@ const func = async (req, res) => {
   }
 };
 
-const type = "GET";
-const url = '/GetUser/:id';
-const auth = true;
-const role = 9999;
-export { func , type, url, auth, role };
+const metadata = {
+  type: 'GET',
+  url: '/GetUser/:id',
+  auth: true,
+  role: ['ADMIN', 'MODERATOR'],
+};
+
+export { func, metadata };

@@ -7,18 +7,18 @@ import { Strategy as DiscordStrategy } from 'passport-discord';
 import prisma from './database/Prisma.mjs';
 
 passport.serializeUser((user, done) => {
-  done(null, user.User_id);
+  done(null, { id: user.User_discord_id , roles: user.User_roles })
 });
 
-passport.deserializeUser(async (id, done) => {
+passport.deserializeUser(async ({id,role}, done) => {
   const user = await prisma.users.findFirst({
     where: {
-      User_id: id,
+      User_discord_id: id,
     },
   });
-  if (user) {
-    done(null, user);
-  }
+
+  if (user) done(null, user)
+  else  done(new Error("User not found"))
 });
 
 passport.use(new DiscordStrategy({
@@ -27,6 +27,7 @@ passport.use(new DiscordStrategy({
   callbackURL: process.env.CLIENT_REDIRECT,
   scope: [ 'identify', 'email', 'guilds' ]
 }, async (accessToken, refreshToken, profile, done) => {
+  //console.log(profile)
   try {
     const existingUser = await prisma.users.findFirst({
       where: {
@@ -43,6 +44,7 @@ passport.use(new DiscordStrategy({
           User_discord_refresh_token: refreshToken,
         }
       });
+      //console.log(updatedUser)
       return done(null, updatedUser);
     } else {
       const newUser = await prisma.users.create({
@@ -56,6 +58,7 @@ passport.use(new DiscordStrategy({
           User_discord_refresh_token: refreshToken,
         },
       });
+      //console.log(newUser)
       return done(null, newUser);
     }
   } catch (err) {

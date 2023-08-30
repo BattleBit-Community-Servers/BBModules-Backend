@@ -1,3 +1,4 @@
+// DiscordCallback.mjs
 
 import 'dotenv/config';
 import path from 'path';
@@ -13,8 +14,24 @@ const func = passport.authenticate('discord', {
   failureRedirect: '/' // Redirect after failed login
 });
 
-const type = "GET";
-const url = "/discord/callback";
-const auth = false;
-const role = 9999;
-export { func , type, url, auth, role };
+const metadata = {
+  type: 'GET',
+  url: '/discord/callback',
+  auth: false,
+  role: [],
+};
+
+export { func, metadata };
+
+/**
+ * @swagger
+ * /auth/discord/callback:
+ *   get:
+ *     tags: 
+ *      - auth
+ *     summary: Discord Oauth redirects the users here
+ *     description: Discord Oauth redirects the users here, they are redirected to the home page if that's a failure, or to their /profile if it's a success
+ *     responses:
+ *       302:
+ *         description: Header Location
+ */

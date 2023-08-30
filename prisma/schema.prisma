@@ -16,7 +16,7 @@ enum UserRole {
 
 model users {
   User_id                    Int       @id @default(autoincrement())
-  User_roles                 UserRole
+  User_roles                 UserRole  @default(USER)
   User_displayname           String?   @db.VarChar(255)
   User_email                 String    @db.VarChar(255)
   User_is_banned             Boolean?  @default(false)

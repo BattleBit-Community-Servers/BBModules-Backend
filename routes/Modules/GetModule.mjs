@@ -1,37 +1,5 @@
 //GetModule.mjs
 
-/**
- * @swagger
- * /Modules/GetModule/{moduleId}:
- *   get:
- *     tags: 
- *      - Modules
- *     summary: Retrieve the module from the given id.
- *     description: Retrieve the module from the given id, and it's last version.
- *     responses:
- *       200:
- *         description: A module.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 data:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       id:
- *                         type: integer
- *                         description: The user ID.
- *                         example: 0
- *                       name:
- *                         type: string
- *                         description: The user's name.
- *                         example: Leanne Graham
- */
-
-//{"Module_id":1,"Module_name":"Goaty jokes","Module_author_id":1,"Module_downloads":0,"Module_shortdesc":"How did the pig get to the hogspital? In a hambulance.","Module_markdown":"huge collection of jokes, because why not !?","Module_created_at":"2023-08-30T00:23:41.000Z","Module_updated_at":"2023-08-30T00:23:41.000Z","users":{"User_displayname":"goat_609","User_discord_id":"167555761831018496"},"versions":[{"Version_v_number":"0.1.3"},{"Version_v_number":"0.1.0"}]}
 import prisma from '../../database/Prisma.mjs';
 
 const func = async (req, res) => {
@@ -73,8 +41,69 @@ const func = async (req, res) => {
   }
 };
 
-const type = "GET";
-const url = '/GetModule/:id';
-const auth = false;
-const role = 9999;
-export { func , type, url, auth, role };
+const metadata = {
+  type: 'GET',
+  url: '/GetModule/:id',
+  auth: false,
+  role: ['ADMIN', 'MODERATOR', 'USER'],
+};
+
+export { func, metadata };
+
+/**
+ * @swagger
+ * /Modules/GetModule/{moduleId}:
+ *   get:
+ *     tags: 
+ *      - Modules
+ *     summary: Retrieve the module from the given id.
+ *     description: Retrieve the module from the given id, and it's last version.
+ *     responses:
+ *       200:
+ *         description: Successful response with Module info
+ *         schema:
+ *           type: object
+ *           properties:
+ *             Module_id:
+ *               type: integer
+ *               example: 1
+ *             Module_name:
+ *               type: string
+ *               example: Goaty jokes
+ *             Module_author_id:
+ *               type: integer
+ *               example: 1
+ *             Module_downloads:
+ *               type: integer
+ *               example: 8474014
+ *             Module_shortdesc:
+ *               type: string
+ *               example: How did the pig get to the hospital? In a hambulance.
+ *             Module_markdown:
+ *               type: string
+ *               example: huge collection of jokes, because why not !?
+ *             Module_created_at:
+ *               type: date
+ *               example: 2023-08-30T00:23:41.000Z
+ *             users:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   User_displayname:
+ *                     type: date
+ *                     example: 2023-09-01T00:02:45.000Z
+ *                   User_discord_id:
+ *                     type: string
+ *                     example: 159652894598456165
+ *             versions:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   Version_v_number:
+ *                     type: string
+ *                     example: 0.1.3
+*/
+
+//{"users":{"User_displayname":"goat_609","User_discord_id":"167555761831018496"},"versions":[{"Version_v_number":"0.1.3"},{"Version_v_number":"0.1.0"}]}

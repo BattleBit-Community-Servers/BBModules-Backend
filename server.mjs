@@ -1,6 +1,7 @@
 // server.mjs
 
-import 'dotenv/config';
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 // Express related
 import express from 'express';
@@ -22,37 +23,44 @@ import prisma from './database/Prisma.mjs';
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './swagger.mjs';
 
+// Chalk for beautiful term colors
+import chalk from 'chalk';
 const app = express();
 const PORT = process.env.PORT || 2565;
 
 const startServer = async () => {
   try {
+
+    app.enable('trust proxy');
     app.use(express.json());
     app.use(bodyParser.urlencoded({ extended: true }));
 
     app.use(session({
-      secret: "g6re-841z0/-re+0g8-8er",
-      resave: true,
+      secret: process.env.SESSION_SECRET,
+      resave: false,
       saveUninitialized: true,
+      store: new session.MemoryStore(),
       cookie: {
-        maxAge: 86400000 //process.env.COOKIE_MAXAGE glitches, can't detect it in .env
+        secure: true,   // HTTPS
+        httpOnly: true,
+        maxAge: parseInt(process.env.COOKIE_MAXAGE)
       }
     }));
+
     app.use(passport.initialize());
     app.use(passport.session());
-
-    loadPages();
+    
+    await loadPages();
     app.use('/', WebsiteRouter);
 
     app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-
-    app.use(express.static('public'));
     
+    app.use(express.static('public'));
     app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
+      console.log(chalk.cyan(`Server is running on port ${PORT}`));
     });
   } catch (error) {
-    console.error('Error starting the server:', error);
+    console.error(chalk.red('Error starting the server:', error));
   }
 };
 

@@ -1,30 +1,29 @@
 //authMiddleWare.mjs
 
 const authMiddleware = (auth, role) => {
-  return async(req, res, next) => {
-
-    if(!role) role = 0; // role => 0 to 9999, 9999 being the worst, 0 being admin
-
-
-    if(!auth){
+  return async (req, res, next) => {
+    if (!auth) {
       return next();
     }
     try {
-      ensureAuthenticated(req, res, next, role)
+      ensureAuthenticated(req, res, next, role);
     } catch (error) {
-      console.error( 'Auth middleware error:', error );
-      res.status(500).json( { message: 'Internal server error.' } );
+      console.error('Auth middleware error:', error);
+      res.status(500).json({ message: 'Internal server error.' });
     }
-  }
+  };
 };
-
 
 function ensureAuthenticated(req, res, next, role) {
   if (req.isAuthenticated()) {
-    if(req.user.role <= role)
+    if (!role || role.includes('') || role.includes(req.user.User_roles)) {
       return next();
+    } else {
+      res.status(401).json({ message: 'Unauthorized' });
+    }
+  } else {
+    res.status(403).json({ message: 'Forbidden' });
   }
-  res.status(401).json( { message: 'Unauthorized' } );
 }
 
 export { authMiddleware };

@@ -12,8 +12,11 @@ const func = async (req, res) => {
   }
 };
 
-const type = "GET";
-const url = '/GetAllUsers';
-const auth = true;
-const role = 9999;
-export { func , type, url, auth, role };
+const metadata = {
+  type: 'GET',
+  url: '/GetAllUsers',
+  auth: true,
+  role: ['ADMIN', 'MODERATOR'],
+};
+
+export { func, metadata };
