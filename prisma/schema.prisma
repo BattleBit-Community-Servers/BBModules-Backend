@@ -52,6 +52,7 @@ model versions {
   Version_module_id  Int?
   Version_v_number   String        @db.VarChar(20)
   Version_file_path  String?       @db.VarChar(255)
+  Version_changelog  String?       @db.LongText
   Version_approved   Boolean?      @default(false)
   Version_created_at DateTime?     @default(now()) @db.Timestamp(0)
   dependencies       dependencies?

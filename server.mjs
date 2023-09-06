@@ -5,8 +5,9 @@ dotenv.config();
 
 // Express related
 import express from 'express';
-import bodyParser from 'body-parser';
 import session from 'express-session';
+import fileUpload from 'express-fileupload';
+import cors from 'cors';
 
 // Discord Oauth
 import passport from 'passport';
@@ -18,23 +19,29 @@ import { WebsiteRouter, loadPages } from './routers/WebsiteRouter.mjs';
 // Prisma DB
 import prisma from './database/Prisma.mjs';
 
-
 // Swagger
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './swagger.mjs';
 
 // Chalk for beautiful term colors
 import chalk from 'chalk';
+
+
 const app = express();
 const PORT = process.env.PORT || 2565;
 
 const startServer = async () => {
   try {
 
+    // proxy & cors
     app.enable('trust proxy');
-    app.use(express.json());
-    app.use(bodyParser.urlencoded({ extended: true }));
+    app.use(cors());
 
+
+    app.use(express.json()); 
+    app.use(express.urlencoded({ extended: true }));
+
+    // Sessions
     app.use(session({
       secret: process.env.SESSION_SECRET,
       resave: false,
@@ -47,12 +54,18 @@ const startServer = async () => {
       }
     }));
 
+    // Passport
     app.use(passport.initialize());
     app.use(passport.session());
     
+    // Files upload
+    app.use(fileUpload());
+
+    // Pages router
     await loadPages();
     app.use('/', WebsiteRouter);
 
+    // Swagger docs
     app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
     
     app.use(express.static('public'));

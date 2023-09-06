@@ -24,17 +24,33 @@ const func = async (req, res) => {
             Version_id: 'desc'
           },
           select: {
-            Version_v_number: true
+            Version_v_number: true,
+            Version_approved: true,
           },
         },
       },
     });
 
-    /*if (module.users?.User_discord_id !== null) {
-      module.users.User_discord_id = module.users.User_discord_id.toString();
-    }*/
+    let targetUserDiscordId = "";
+    let role = false;
 
-    res.status(200).json(module);
+    if(req.user){
+      targetUserDiscordId = req.user.User_discord_id;
+      if(req.user.roles == 'ADMIN' || 'MODERATOR') role = true;
+    }
+
+    const modifiedModule = {
+      ...module,
+      versions: module.versions.filter((version) => {
+        return (
+          version.Version_approved === true ||
+          module.users.User_discord_id === targetUserDiscordId ||
+          role
+        );
+      }),
+    };
+
+    res.status(200).json({modifiedModule, module});
   } catch (error) {
     console.error('Error fetching reports:', error);
     res.status(500).json({ message: 'Internal server error.' });
