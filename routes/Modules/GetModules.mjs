@@ -78,7 +78,7 @@ const GetModules = async (req, res) => {
 
     // By default, for cases not handled in the if statements below (eg. for admin, moderator), all modules are shown
 
-    if (req.user && (req.user.roles == 'ADMIN' || req.user.roles == 'MODERATOR')) {
+    if (req.user && req.user.roles != 'ADMIN' && req.user.roles != 'MODERATOR') {
       // Logged in non-admin and non-moderator users can only see modules they have submitted or modules that have been approved
       userDiscordId = req.user.User_discord_id;
 
@@ -157,7 +157,7 @@ const GetModules = async (req, res) => {
       results: modules,
       count: Math.ceil((await totalModulesCountQuery)/pageSize)
     };
-    
+
     res.status(200).json(response);
   } catch (error) {
     console.error('Error fetching reports:', error);
