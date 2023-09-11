@@ -142,9 +142,9 @@ const GetModules = async (req, res) => {
         ...searchCondition
       };
     }
-    
+
     const modules = (await prisma.modules.findMany(modulesQuery)).filter(m => m.versions.length > 0);
-    const moduleResultList = modules.splice((page - 1) * pageSize, pageSize).map(module => ({
+    const moduleResultList = modules.slice((page - 1) * pageSize, (page - 1) * pageSize + pageSize).map(module => ({
       ...module,
       Module_shortdesc: module.Module_shortdesc ? module.Module_shortdesc.slice(0, 256) : null,
     }));
