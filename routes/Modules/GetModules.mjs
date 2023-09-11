@@ -9,17 +9,16 @@ const metadata = {
   role: ['ADMIN', 'MODERATOR', 'USER'],
 };
 
-const func = async (req, res) => {
+const GetModules = async (req, res) => {
   try {
-    
     const page = parseInt(req.query.page || 1);
-    const pageSize = 5;
+    const pageSize = 6;
 
     const sort = req.query.sort || 'A-Z';
 
     let orderBy;
 
-    if( req.query.search && req.query.search.length <= 3 ) {
+    if (req.query.search && req.query.search.length <= 3) {
       res.status(400).json({message:"search query too short"});
       return;
     }
@@ -47,218 +46,119 @@ const func = async (req, res) => {
         orderBy = { Module_name: 'asc' }; // Default to 'A-Z'
     }
 
-    let modules;
-    let totalModulesCount;
-
-    if(req.user){
-      if(req.user.roles == 'ADMIN' || 'MODERATOR'){
-        totalModulesCount = await prisma.modules.count({});
-        modules = await prisma.modules.findMany({
-          skip: (page - 1) * pageSize,
-          take: pageSize,
-          orderBy: orderBy,
+    // Base query
+    let modulesQuery = {
+      orderBy: orderBy,
+      select: {
+        Module_id: true,
+        Module_name: true,
+        Module_shortdesc: true,
+        Module_markdown: true,
+        Module_downloads: true,
+        users: {
           select: {
-            Module_id: true,
-            Module_name: true,
-            Module_shortdesc: true,
-            Module_markdown: true,
-            Module_downloads: true,
-            users: {
-              select: {
-                User_displayname: true,
-                User_discord_id: true,
-              },
-            },
-            versions: {
-              select: {
-                Version_v_number: true,
-                Version_approved: true,
-              },
-              orderBy: {
-                Version_v_number: 'desc',
-              },
-            },
+            User_displayname: true,
+            User_discord_id: true,
           },
-        });
-      }else{
-        userDiscordId = req.user.User_discord_id;
-
-        totalModulesCount = await prisma.modules.count({
-          where: {
-            OR: [
-              {
-                versions: {
-                  some: {
-                    Version_approved: true,
-                  },
-                }
-              },
-              {
-                users: {
-                  User_discord_id: userDiscordId,
-                },
-              },
-            ],
-          }
-        });
-        modules = await prisma.modules.findMany({
-          skip: (page - 1) * pageSize,
-          take: pageSize,
-          where: {
-            OR: [
-              {
-                versions: {
-                  some: {
-                    Version_approved: true,
-                  },
-                }
-              },
-              {
-                users: {
-                  User_discord_id: userDiscordId,
-                },
-              },
-            ],
-          },
-          orderBy: orderBy,
+        },
+        versions: {
           select: {
-            Module_id: true,
-            Module_name: true,
-            Module_shortdesc: true,
-            Module_markdown: true,
-            Module_downloads: true,
-            users: {
-              select: {
-                User_displayname: true,
-                User_discord_id: true,
-              },
-            },
-            versions: {
-              where: {
-                Version_approved: true,
-              },
-              select: {
-                Version_v_number: true,
-                Version_approved: true,
-              },
-              orderBy: {
-                Version_v_number: 'desc',
-              },
-            },
+            Version_v_number: true,
+            Version_approved: true,
           },
-        });
+          orderBy: {
+            Version_created_at: 'desc',
+          },
+        },
       }
-    }else{
-      totalModulesCount = await prisma.modules.count({
-        where: {
-          versions: {
-            some: {
+    };
+
+    // By default, for cases not handled in the if statements below (eg. for admin, moderator), all modules are shown
+
+    if (req.user && req.user.roles != 'ADMIN' && req.user.roles != 'MODERATOR') {
+      // Logged in non-admin and non-moderator users can only see modules they have submitted or modules that have been approved
+      userDiscordId = req.user.User_discord_id;
+
+      const ownerCondition = {
+        OR: [
+          {
               Version_approved: true,
+          },
+          {
+            users: {
+              User_discord_id: userDiscordId,
             },
           },
-          OR: [
-            {
-              Module_name: {
-                contains: req.query.search != null ? req.query.search : undefined,
-              },
-            },
-            {
-              Module_markdown: {
-                contains: req.query.search != null ? req.query.search : undefined,
-              }
-            },
-            {
-              Module_shortdesc: {
-                contains: req.query.search != null ? req.query.search : undefined,
-              },
-            },
-            {
-              users: {
-                User_displayname: {
-                  contains: req.query.search != null ? req.query.search : undefined,
-                },
-              },
-            },
-          ]
-        }
-      });
-      modules = await prisma.modules.findMany({
-        skip: (page - 1) * pageSize,
-        take: pageSize,
-        where: {
-          versions: {
-            some: {
-              Version_approved: true,
-            },
-          },
-          OR: [
-            {
-              Module_name: {
-                contains: req.query.search != null ? req.query.search : undefined,
-              },
-            },
-            {
-              Module_markdown: {
-                contains: req.query.search != null ? req.query.search : undefined,
-              }
-            },
-            {
-              Module_shortdesc: {
-                contains: req.query.search != null ? req.query.search : undefined,
-              },
-            },
-            {
-              users: {
-                User_displayname: {
-                  contains: req.query.search != null ? req.query.search : undefined,
-                },
-              },
-            },
-          ]
-        },
-        orderBy: orderBy,
-        select: {
-          Module_id: true,
-          Module_name: true,
-          Module_shortdesc: true,
-          Module_markdown: true,
-          Module_downloads: true,
-          users: {
-            select: {
-              User_displayname: true,
-              User_discord_id: true,
-            },
-          },
-          versions: {
-            where: {
-              Version_approved: true,
-            },
-            select: {
-              Version_v_number: true,
-              Version_approved: true,
-            },
-            orderBy: {
-              Version_v_number: 'desc',
-            },
-          },
-        },
-      });
+        ]
+      };
+
+      modulesQuery.select.versions.where = {
+        ...modulesQuery.select.versions.where,
+        ...ownerCondition
+      };
+    } else if (!req.user) {
+      // Non logged in users can only see modules that have been approved
+      const approvedCondition = {
+        Version_approved: true,
+      };
+
+      modulesQuery.select.versions.where = {
+        ...modulesQuery.select.versions.where,
+        ...approvedCondition
+      };
     }
 
-    modules = modules.map(module => ({
+    // Search condition
+    if (req.query.search) {
+      const searchCondition = {
+        OR: [
+          {
+            Module_name: {
+              contains: req.query.search,
+            },
+          },
+          {
+            Module_markdown: {
+              contains: req.query.search,
+            }
+          },
+          {
+            Module_shortdesc: {
+              contains: req.query.search,
+            },
+          },
+          {
+            users: {
+              User_displayname: {
+                contains: req.query.search,
+              },
+            },
+          },
+        ]
+      };
+
+      modulesQuery.where = {
+        ...modulesQuery.where,
+        ...searchCondition
+      };
+    }
+    
+    const modules = (await prisma.modules.findMany(modulesQuery)).filter(m => m.versions.length > 0);
+    const moduleResultList = modules.splice((page - 1) * pageSize, pageSize).map(module => ({
       ...module,
       Module_shortdesc: module.Module_shortdesc ? module.Module_shortdesc.slice(0, 256) : null,
     }));
     
-    const eeee = {
-      results: modules,
-      count: Math.ceil(totalModulesCount/pageSize)
-    }
-    res.status(200).json(eeee);
+    const response = {
+      results: moduleResultList,
+      count: Math.ceil(modules.length / pageSize)
+    };
+
+    res.status(200).json(response);
   } catch (error) {
     console.error('Error fetching reports:', error);
     res.status(500).json({ message: 'Internal server error.' });
   }
 };
 
-export { func, metadata };
+export { GetModules as func, metadata };
