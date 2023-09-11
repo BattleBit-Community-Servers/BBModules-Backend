@@ -13,7 +13,7 @@ const func = async (req, res) => {
   try {
     
     const page = parseInt(req.query.page || 1);
-    const pageSize = 5;
+    const pageSize = 6;
 
     const sort = req.query.sort || 'A-Z';
 
