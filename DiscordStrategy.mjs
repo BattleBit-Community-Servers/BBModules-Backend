@@ -14,7 +14,7 @@ passport.deserializeUser(async ({id,role}, done) => {
   const user = await prisma.users.findFirst({
     where: {
       User_discord_id: id,
-    },
+    }
   });
 
   if (user) done(null, user)
@@ -34,6 +34,12 @@ passport.use(new DiscordStrategy({
         User_discord_id: profile.id,
       },
     });
+
+    // if user banned
+    if (existingUser && existingUser.User_is_banned) {
+      return done("User is banned");
+    }
+
     if (existingUser) {
       const updatedUser = await prisma.users.update({
         where: {

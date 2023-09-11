@@ -35,7 +35,10 @@ const startServer = async () => {
 
     // proxy & cors
     app.enable('trust proxy');
-    app.use(cors());
+    app.use(cors({
+      origin: '*',
+      credentials: true,
+    }));
 
 
     app.use(express.json()); 

@@ -37,8 +37,10 @@ const func = async (req, res) => {
           Version_v_number: true,
           Version_file_path: true,
           Version_approved: true,
+          Version_id: true,
           modules: {
             select: {
+              Module_id: true,
               users: {
                 select: {
                   User_discord_id: true
@@ -86,8 +88,10 @@ const func = async (req, res) => {
           Version_v_number: true,
           Version_file_path: true,
           Version_approved: true,
+          Version_id: true,
           modules: {
             select: {
+              Module_id: true,
               users: {
                 select: {
                   User_discord_id: true
@@ -104,6 +108,9 @@ const func = async (req, res) => {
       }
       
       if(filePath !== ''){
+        
+        addCount(v.modules.Module_id, v.Version_id)
+
         const fp = path.join(__dirname, basePath, filePath);
         res.download(fp, (err) => {
           if (err) {
@@ -123,4 +130,28 @@ const func = async (req, res) => {
   }
 };
 
+async function addCount(moduleID, versionID){
+  await prisma.modules.update({
+    where: {
+      Module_id: moduleID,
+    },
+    data: {
+      Module_downloads: {
+        increment: 1,
+      },
+    },
+  });
+
+  // Increment download count for version
+  await prisma.versions.update({
+    where: {
+      Version_id: versionID,
+    },
+    data: {
+      Version_downloads: {
+        increment: 1,
+      },
+    },
+  });
+}
 export { func, metadata };
