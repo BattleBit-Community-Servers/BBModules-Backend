@@ -46,12 +46,9 @@ const GetModules = async (req, res) => {
         orderBy = { Module_name: 'asc' }; // Default to 'A-Z'
     }
 
-    // Base queries
-    let totalModulesCountQuery = prisma.modules.count();
-    let modulesQuery = prisma.modules.findMany({
+    // Base query
+    let modulesQuery = {
       orderBy: orderBy,
-      skip: (page - 1) * pageSize,
-      take: pageSize,
       select: {
         Module_id: true,
         Module_name: true,
@@ -73,8 +70,8 @@ const GetModules = async (req, res) => {
             Version_created_at: 'desc',
           },
         },
-      },
-    });
+      }
+    };
 
     // By default, for cases not handled in the if statements below (eg. for admin, moderator), all modules are shown
 
@@ -85,34 +82,30 @@ const GetModules = async (req, res) => {
       const ownerCondition = {
         OR: [
           {
-            versions: {
-              some: {
-                Version_approved: true,
-              },
-            }
+              Version_approved: true,
           },
           {
             users: {
               User_discord_id: userDiscordId,
             },
           },
-        ],
+        ]
       };
 
-      modulesQuery = modulesQuery.where(ownerCondition);
-      totalModulesCountQuery = totalModulesCountQuery.where(ownerCondition);
+      modulesQuery.select.versions.where = {
+        ...modulesQuery.select.versions.where,
+        ...ownerCondition
+      };
     } else if (!req.user) {
       // Non logged in users can only see modules that have been approved
       const approvedCondition = {
-          versions: {
-            some: {
-              Version_approved: true,
-            },
-          }
+        Version_approved: true,
       };
 
-      totalModulesCountQuery = totalModulesCountQuery.where(approvedCondition);
-      modulesQuery = modulesQuery.where(approvedCondition);
+      modulesQuery.select.versions.where = {
+        ...modulesQuery.select.versions.where,
+        ...approvedCondition
+      };
     }
 
     // Search condition
@@ -144,18 +137,21 @@ const GetModules = async (req, res) => {
         ]
       };
 
-      totalModulesCountQuery = totalModulesCountQuery.where(searchCondition);
-      modulesQuery = modulesQuery.where(searchCondition);
+      modulesQuery.where = {
+        ...modulesQuery.where,
+        ...searchCondition
+      };
     }
-
-    const modules = (await modulesQuery).map(module => ({
+    
+    const modules = (await prisma.modules.findMany(modulesQuery)).filter(m => m.versions.length > 0);
+    const moduleResultList = modules.splice((page - 1) * pageSize, pageSize).map(module => ({
       ...module,
       Module_shortdesc: module.Module_shortdesc ? module.Module_shortdesc.slice(0, 256) : null,
     }));
     
     const response = {
-      results: modules,
-      count: Math.ceil((await totalModulesCountQuery)/pageSize)
+      results: moduleResultList,
+      count: Math.ceil(modules.length / pageSize)
     };
 
     res.status(200).json(response);
