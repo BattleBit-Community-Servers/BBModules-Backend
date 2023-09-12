@@ -26,6 +26,18 @@ const func = async (req, res) => {
           select: {
             Version_v_number: true,
             Version_approved: true,
+            dependencies: {
+              select: {
+                Dependency_type: true,
+                Dependency_binary_text: true,
+                module: {
+                  select: {
+                    Module_id: true,
+                    Module_name: true,
+                  },
+                }
+              }
+            }
           },
         },
       },
