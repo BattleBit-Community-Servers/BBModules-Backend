@@ -46,9 +46,9 @@ const func = async (req, res) => {
     let targetUserDiscordId = "";
     let role = false;
 
-    if(req.user){
+    if (req.user) {
       targetUserDiscordId = req.user.User_discord_id;
-      if(req.user.roles == 'ADMIN' || 'MODERATOR') role = true;
+      if (req.user.roles == 'ADMIN' || 'MODERATOR') role = true;
     }
 
     const modifiedModule = {
@@ -82,7 +82,7 @@ export { func, metadata };
  * @swagger
  * /Modules/GetModule/{moduleId}:
  *   get:
- *     tags: 
+ *     tags:
  *      - Modules
  *     summary: Retrieve the module from the given id.
  *     description: Retrieve the module from the given id, and it's last version.

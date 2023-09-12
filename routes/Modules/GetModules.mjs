@@ -19,7 +19,7 @@ const GetModules = async (req, res) => {
     let orderBy;
 
     if (req.query.search && req.query.search.length <= 3) {
-      res.status(400).json({message:"search query too short"});
+      res.status(400).json({ message: "search query too short" });
       return;
     }
 
@@ -41,7 +41,7 @@ const GetModules = async (req, res) => {
         break;
       case 'leastDownloads':
         orderBy = { Module_downloads: 'asc' };
-        break;  
+        break;
       default:
         orderBy = { Module_name: 'asc' }; // Default to 'A-Z'
     }
@@ -82,7 +82,7 @@ const GetModules = async (req, res) => {
       const ownerCondition = {
         OR: [
           {
-              Version_approved: true,
+            Version_approved: true,
           },
           {
             users: {
@@ -148,7 +148,7 @@ const GetModules = async (req, res) => {
       ...module,
       Module_shortdesc: module.Module_shortdesc ? module.Module_shortdesc.slice(0, 256) : null,
     }));
-    
+
     const response = {
       results: moduleResultList,
       count: Math.ceil(modules.length / pageSize)
