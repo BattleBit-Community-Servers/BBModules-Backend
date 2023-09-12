@@ -36,6 +36,7 @@ model modules {
   Module_updated_at DateTime?  @default(now()) @db.Timestamp(0)
   users             users?     @relation(fields: [Module_author_id], references: [User_id], onDelete: Restrict, onUpdate: Restrict, map: "modules_ibfk_1")
   versions          versions[]
+  dependencies      dependencies[]
 
   @@index([Module_author_id], map: "Module_author_id")
 }
@@ -49,7 +50,7 @@ model versions {
   Version_changelog  String?       @db.LongText
   Version_approved   Boolean?      @default(false)
   Version_created_at DateTime?     @default(now()) @db.Timestamp(0)
-  dependencies       dependencies?
+  dependencies       dependencies[]
   modules            modules?      @relation(fields: [Version_module_id], references: [Module_id], onDelete: Restrict, onUpdate: Restrict, map: "versions_ibfk_1")
 
   @@index([Version_module_id], map: "Version_module_id")
@@ -57,11 +58,13 @@ model versions {
 
 model dependencies {
   Dependency_id          Int                          @id @default(autoincrement())
-  Dependency_version_id  Int?                         @unique(map: "Dependency_version_id")
+  Dependency_version_id  Int
   Dependency_type        dependencies_Dependency_type
   Dependency_binary_text String?                      @db.Text
+  Dependency_module_id   Int?
   Dependency_created_at  DateTime?                    @default(now()) @db.Timestamp(0)
-  versions               versions?                    @relation(fields: [Dependency_version_id], references: [Version_id], onDelete: Restrict, onUpdate: Restrict, map: "dependencies_ibfk_1")
+  versions               versions?                    @relation(fields: [Dependency_version_id], references: [Version_id], onDelete: Restrict, onUpdate: Restrict, map: "dependencies_ivfk_1")
+  module                 modules?                     @relation(fields: [Dependency_module_id], references: [Module_id], onDelete: Restrict, onUpdate: Restrict, map: "dependencies_dmfk_1")
 }
 
 enum UserRole {

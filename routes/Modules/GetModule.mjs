@@ -5,9 +5,11 @@ import prisma from '../../database/Prisma.mjs';
 const func = async (req, res) => {
   try {
     const id = parseInt(req.params.id);
+
     if (isNaN(id)) {
       return res.status(400).json({ message: 'Invalid ID parameter. Must be a number.' });
     }
+
     const module = await prisma.modules.findFirst({
       where: {
         Module_id: id,
@@ -26,31 +28,36 @@ const func = async (req, res) => {
           select: {
             Version_v_number: true,
             Version_approved: true,
+            dependencies: {
+              select: {
+                Dependency_type: true,
+                Dependency_binary_text: true,
+                module: {
+                  select: {
+                    Module_id: true,
+                    Module_name: true,
+                  },
+                }
+              }
+            }
           },
         },
       },
     });
 
-    let targetUserDiscordId = "";
-    let role = false;
-
-    if(req.user){
-      targetUserDiscordId = req.user.User_discord_id;
-      if(req.user.roles == 'ADMIN' || 'MODERATOR') role = true;
+    if (req.user && req.user.roles !== 'ADMIN' && req.user.roles !== 'MODERATOR') {
+      // Logged in users that are not admins or moderators can only see approved or their own versions
+      module.versions = module.versions.filter((version) =>
+        version.Version_approved === true ||
+        version.users.User_discord_id === req.user.User_discord_id
+      );
+    } else if (!req.user) {
+      // If user is not logged in, only approved versions are shown
+      module.versions = module.versions.filter((version) => version.Version_approved === true);
     }
+    // If user is admin or moderator, all versions are shown, default behaviour
 
-    const modifiedModule = {
-      ...module,
-      versions: module.versions.filter((version) => {
-        return (
-          version.Version_approved === true ||
-          module.users.User_discord_id === targetUserDiscordId ||
-          role
-        );
-      }),
-    };
-
-    res.status(200).json(modifiedModule);
+    res.status(200).json(module);
   } catch (error) {
     console.error('Error fetching reports:', error);
     res.status(500).json({ message: 'Internal server error.' });
@@ -70,7 +77,7 @@ export { func, metadata };
  * @swagger
  * /Modules/GetModule/{moduleId}:
  *   get:
- *     tags: 
+ *     tags:
  *      - Modules
  *     summary: Retrieve the module from the given id.
  *     description: Retrieve the module from the given id, and it's last version.
