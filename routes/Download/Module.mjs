@@ -9,8 +9,6 @@ import prisma from '../../database/Prisma.mjs';
 
 const basePath = '../../MODULES/';
 
-let filePath = '';
-
 const metadata = {
   type: 'GET',
   url: '/:moduleName/:version',
@@ -46,12 +44,18 @@ const func = async (req, res) => {
     }
   };
 
-  if (req.user && req.user.roles !== 'ADMIN' && req.user.roles !== 'MODERATOR') {
+  if (req.user && req.user.User_roles !== 'ADMIN' && req.user.User_roles !== 'MODERATOR') {
     // Logged in users that are not admins or moderators can only see approved or their own versions
     versionsQuery.where = {
       ...versionsQuery.where,
       OR: [
-        { User_discord_id: req.user.User_discord_id },
+        {
+          modules: {
+            users: {
+              User_discord_id: req.user.User_discord_id
+            }
+          },
+        },
         { Version_approved: true }
       ]
     };
@@ -75,27 +79,27 @@ const func = async (req, res) => {
     };
   }
 
+  let version;
   try {
-    const version = await prisma.versions.findFirstOrThrow(versionsQuery)
-    if (version) {
-      filePath = version.Version_file_path;
+    version = await prisma.versions.findFirstOrThrow(versionsQuery)
+    if (!version || !version.Version_file_path || version.Version_file_path === '') {
+      throw new Error(`No path for version ${req.params.version} of module ${req.params.moduleName} found.`);
     }
   } catch (error) {
     console.error('Error fetching versions:', error);
-    res.status(500).json({ message: 'Internal server error.' });
+    res.status(404).json({ message: 'No version found.' });
+    return;
   }
 
-  // file exists ?
-  if (filePath !== '') {
-    const fp = path.join(__dirname, basePath, filePath);
-    res.download(fp, (err) => {
-      if (err) {
-        res.status(404).send('File not found');
-      }
-    });
-  } else {
-    res.status(401).json({ message: 'No version found' });
-  }
+  const fp = path.join(__dirname, basePath, version.Version_file_path);
+  console.log(fp);
+  res.download(fp, (err) => {
+    if (err) {
+      console.error('Error downloading file:', err);
+      res.status(404).json({ message: 'File not found' });
+      return;
+    }
+  });
 };
 
 async function addCount(moduleID, versionID) {
@@ -122,4 +126,5 @@ async function addCount(moduleID, versionID) {
     },
   });
 }
+
 export { func as func, metadata };
