@@ -45,7 +45,7 @@ const func = async (req, res) => {
       },
     });
 
-    if (req.user && req.user.roles !== 'ADMIN' && req.user.roles !== 'MODERATOR') {
+    if (req.user && req.user.User_roles !== 'ADMIN' && req.user.User_roles !== 'MODERATOR') {
       // Logged in users that are not admins or moderators can only see approved or their own versions
       module.versions = module.versions.filter((version) =>
         version.Version_approved === true ||

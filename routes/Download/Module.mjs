@@ -9,8 +9,6 @@ import prisma from '../../database/Prisma.mjs';
 
 const basePath = '../../MODULES/';
 
-let filePath = '';
-
 const metadata = {
   type: 'GET',
   url: '/:moduleName/:version',
@@ -19,92 +17,92 @@ const metadata = {
 };
 
 const func = async (req, res) => {
-  try {
-
-    let versionsQuery = {
-      where: {
-        modules: {
-          Module_name: req.params.moduleName
-        }
-      },
-      orderBy: {
-        Version_created_at: "desc"
-      },
-      select: {
-        Version_v_number: true,
-        Version_file_path: true,
-        Version_approved: true,
-        Version_id: true,
-        modules: {
-          select: {
-            Module_id: true,
-            users: {
-              select: {
-                User_discord_id: true
-              }
+  let versionsQuery = {
+    where: {
+      modules: {
+        Module_name: req.params.moduleName
+      }
+    },
+    orderBy: {
+      Version_created_at: "desc"
+    },
+    select: {
+      Version_v_number: true,
+      Version_file_path: true,
+      Version_approved: true,
+      Version_id: true,
+      modules: {
+        select: {
+          Module_id: true,
+          users: {
+            select: {
+              User_discord_id: true
             }
           }
         }
       }
-    };
+    }
+  };
 
-    // If want latest version
-    if(req.params.version != 'latest'){
-      const searchCondition = {
-        modules: {
-          Module_name: req.params.moduleName,
+  if (req.user && req.user.User_roles !== 'ADMIN' && req.user.User_roles !== 'MODERATOR') {
+    // Logged in users that are not admins or moderators can only see approved or their own versions
+    versionsQuery.where = {
+      ...versionsQuery.where,
+      OR: [
+        {
+          modules: {
+            users: {
+              User_discord_id: req.user.User_discord_id
+            }
+          },
         },
-        Version_v_number: req.params.version,
-      }
-
-      versionsQuery.where = {
-        ...versionsQuery.where,
-        ...searchCondition
-      };
-
-      const version = await prisma.versions.findFirst(versionsQuery)
-
-      console.log(version)
-
-      if(version && version.Version_approved){
-        filePath = version.Version_file_path;
-      }
-
-    }
-    // If you specify the version manually
-    else{
-
-      const lastVersion = await prisma.versions.findMany(versionsQuery)
-            
-      for (let i = 0; i < lastVersion.length; i++) {
-        const el  = lastVersion[i];
-        if(el.Version_approved){
-          filePath = el.Version_file_path;
-        }
-      }
-    }
-
-    // file exists ?
-    if(filePath !== ''){
-      const fp = path.join(__dirname, basePath, filePath);
-      res.download(fp, (err) => {
-        if (err) {
-          res.status(404).send('File not found');
-        } else {
-          console.log('File download successful');
-        }
-      });
-    }else{
-      res.status(401).json({ message: 'No approved version found' });
-    }
-    
-  } catch (error) {
-    console.error('Error fetching reports:', error);
-    res.status(500).json({ message: 'Internal server error.' });
+        { Version_approved: true }
+      ]
+    };
+  } else if (!req.user) {
+    // If user is not logged in, only approved versions are shown
+    versionsQuery.where = {
+      ...versionsQuery.where,
+      Version_approved: true
+    };
   }
+
+  if (req.params.version != 'latest') {
+    // If you specify the version manually
+    const searchCondition = {
+      Version_v_number: req.params.version,
+    }
+
+    versionsQuery.where = {
+      ...versionsQuery.where,
+      ...searchCondition
+    };
+  }
+
+  let version;
+  try {
+    version = await prisma.versions.findFirstOrThrow(versionsQuery)
+    if (!version || !version.Version_file_path || version.Version_file_path === '') {
+      throw new Error(`No path for version ${req.params.version} of module ${req.params.moduleName} found.`);
+    }
+  } catch (error) {
+    console.error('Error fetching versions:', error);
+    res.status(404).json({ message: 'No version found.' });
+    return;
+  }
+
+  const fp = path.join(__dirname, basePath, version.Version_file_path);
+  console.log(fp);
+  res.download(fp, (err) => {
+    if (err) {
+      console.error('Error downloading file:', err);
+      res.status(404).json({ message: 'File not found' });
+      return;
+    }
+  });
 };
 
-async function addCount(moduleID, versionID){
+async function addCount(moduleID, versionID) {
   await prisma.modules.update({
     where: {
       Module_id: parseInt(moduleID),
@@ -128,4 +126,5 @@ async function addCount(moduleID, versionID){
     },
   });
 }
-export { func, metadata };
+
+export { func as func, metadata };
