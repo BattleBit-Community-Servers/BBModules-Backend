@@ -8,10 +8,10 @@ import passport from 'passport';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-
 const func = passport.authenticate('discord', {
-  successRedirect: '/profile', // Redirect after successful login
-  failureRedirect: '/' // Redirect after failed login
+  successRedirect: '/auth/Success', // Redirect after successful login
+  failureRedirect: process.env.LOGIN_REDIRECT_FAILURE.replace(/{}/, "unknown") // Redirect after failed login
+  // TODO: would be nice to have a reason why the login did not work (eg. banned, not in discord server, etc.)
 });
 
 const metadata = {
