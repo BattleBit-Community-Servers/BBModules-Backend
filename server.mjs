@@ -8,6 +8,7 @@ import express from 'express';
 import session from 'express-session';
 import fileUpload from 'express-fileupload';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 
 // Discord Oauth
 import passport from 'passport';
@@ -36,13 +37,14 @@ const startServer = async () => {
     // proxy & cors
     app.enable('trust proxy');
     app.use(cors({
-      origin: '*',
+      origin: process.env.FRONTEND_URL,
       credentials: true,
     }));
 
 
     app.use(express.json()); 
     app.use(express.urlencoded({ extended: true }));
+    app.use(cookieParser());
 
     // Sessions
     app.use(session({

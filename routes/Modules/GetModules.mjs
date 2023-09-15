@@ -77,7 +77,6 @@ const GetModules = async (req, res) => {
 
     if (req.user && req.user.User_roles != 'ADMIN' && req.user.User_roles != 'MODERATOR') {
       // Logged in non-admin and non-moderator users can only see modules they have submitted or modules that have been approved
-      userDiscordId = req.user.User_discord_id;
 
       const ownerCondition = {
         OR: [
@@ -85,10 +84,12 @@ const GetModules = async (req, res) => {
             Version_approved: true,
           },
           {
-            users: {
-              User_discord_id: userDiscordId,
-            },
-          },
+            modules: {
+              users: {
+                User_discord_id: req.user.User_discord_id
+              }
+            }
+          }
         ]
       };
 
