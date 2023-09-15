@@ -2,10 +2,11 @@
 // Logout.mjs
 
 const func = async (req, res) => {
+  res.clearCookie('userdata');
   try {
     req.logout(function(err) {
       if (err) { return next(err); }
-      res.redirect('/');
+      res.redirect(process.env.LOGOUT_REDIRECT);
     });
   } catch (error) {
     console.error('Error in logout:', error);
