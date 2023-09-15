@@ -68,7 +68,7 @@ const startServer = async () => {
 
     // Pages router
     await loadPages();
-    app.use(process.env.BACKEND_RELATIVE_URL, WebsiteRouter);
+    app.use('/', WebsiteRouter);
 
     // Swagger docs
     app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
