@@ -8,6 +8,7 @@ import express from 'express';
 import session from 'express-session';
 import fileUpload from 'express-fileupload';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 
 // Discord Oauth
 import passport from 'passport';
@@ -43,6 +44,7 @@ const startServer = async () => {
 
     app.use(express.json()); 
     app.use(express.urlencoded({ extended: true }));
+    app.use(cookieParser());
 
     // Sessions
     app.use(session({
