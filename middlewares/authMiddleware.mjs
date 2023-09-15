@@ -2,6 +2,10 @@
 
 const authMiddleware = (auth, role) => {
   return async (req, res, next) => {
+    if (!req.isAuthenticated()) {
+      res.clearCookie('userdata');
+    }
+
     if (!auth) {
       return next();
     }
