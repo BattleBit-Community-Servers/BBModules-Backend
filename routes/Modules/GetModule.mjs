@@ -49,7 +49,7 @@ const func = async (req, res) => {
       // Logged in users that are not admins or moderators can only see approved or their own versions
       module.versions = module.versions.filter((version) =>
         version.Version_approved === true ||
-        version.users.User_discord_id === req.user.User_discord_id
+        module.users.User_discord_id === req.user.User_discord_id
       );
     } else if (!req.user) {
       // If user is not logged in, only approved versions are shown
