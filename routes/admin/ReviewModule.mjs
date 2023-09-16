@@ -1,42 +1,41 @@
 //ReviewModule.mjs
 
+import { json } from 'express';
 import prisma from '../../database/Prisma.mjs';
 
 const func = async (req, res) => {
-  try {
-    const id = parseInt(req.body.id);
-    const state = req.body.state;
-    const comment = req.body.comment;
-    if (isNaN(id)) {
-      return res.status(400).json({ message: 'Invalid ID parameter. Must be a number.' });
-    }
-    
-    if(state == "true"){
-      const v = await prisma.versions.update({
+  const reviewState = req.body;
+
+  if (reviewState.state === true) {
+    try {
+      await prisma.versions.update({
         where: {
-          Version_id: id,
+          Version_id: reviewState.id,
         },
         data: {
           Version_approved: true,
         },
       });
-    }else{
-      const v = await prisma.versions.update({
-        where: {
-          Version_id: id,
-        },
-        data: {
-          Version_refusedMessage: comment,
-        },
-      });
+    } catch (error) {
+      console.error('Error approving version:', error);
+      res.status(500).json({ message: 'Internal server error.' });
+      return;
     }
-    
-
-    res.status(200).json(module);
-  } catch (error) {
-    console.error('Error fetching reports:', error);
-    res.status(500).json({ message: 'Internal server error.' });
+  } else {
+    try {
+      await prisma.versions.delete({
+        where: {
+          Version_id: reviewState.id,
+        }
+      });
+    } catch (error) {
+      console.error('Error declining version:', error);
+      res.status(500).json({ message: 'Internal server error.' });
+      return;
+    }
   }
+
+  res.status(200).json({ message: 'Success' });
 };
 
 const metadata = {
@@ -52,7 +51,7 @@ export { func, metadata };
  * @swagger
  * /Modules/GetModule/{moduleId}:
  *   get:
- *     tags: 
+ *     tags:
  *      - Modules
  *     summary: Retrieve the module from the given id.
  *     description: Retrieve the module from the given id, and it's last version.

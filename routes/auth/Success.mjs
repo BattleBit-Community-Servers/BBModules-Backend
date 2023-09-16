@@ -7,7 +7,7 @@ const func = async (req, res) => {
           User_roles: req.user.User_roles,
         };
     
-        res.cookie('userdata', JSON.stringify(userData), { maxAge: parseInt(process.env.COOKIE_MAXAGE), httpOnly: false });
+        res.cookie('userdata', JSON.stringify(userData), { maxAge: parseInt(process.env.COOKIE_MAXAGE), httpOnly: false, secure: true });
       }
 
       res.redirect(process.env.LOGIN_REDIRECT_SUCCESS);
