@@ -29,6 +29,7 @@ const func = async (req, res) => {
             Version_id: true,
             Version_v_number: true,
             Version_approved: true,
+            Version_changelog: true,
             dependencies: {
               select: {
                 Dependency_type: true,
