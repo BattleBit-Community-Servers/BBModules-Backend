@@ -30,6 +30,7 @@
     "passport": "^0.6.0",
     "passport-discord": "^0.1.4",
     "prisma": "^5.2.0",
+    "rimraf": "^5.0.1",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.0"
   }
