@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "test": "nodemon",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "prisma": "prisma"
   },
   "repository": {
     "type": "git",
