@@ -32,6 +32,11 @@ const func = async (req, res) => {
     return;
   }
 
+  if (!req.files || !req.files.file) {
+    res.status(400).json({ message: 'No file uploaded' });
+    return;
+  }
+
   if (!req.files.file.name.toLowerCase().endsWith('.cs')) {
     res.status(400).json({ message: 'Module extension is not .cs' });
     return;
