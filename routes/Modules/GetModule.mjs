@@ -29,6 +29,7 @@ const func = async (req, res) => {
             Version_id: true,
             Version_v_number: true,
             Version_approved: true,
+            Version_changelog: true,
             dependencies: {
               select: {
                 Dependency_type: true,
@@ -45,6 +46,9 @@ const func = async (req, res) => {
         },
       },
     });
+    if (!module) {
+      return res.status(404).json({ message: 'Module not found.' });
+    }
 
     if (req.user && req.user.User_roles !== 'ADMIN' && req.user.User_roles !== 'MODERATOR') {
       // Logged in users that are not admins or moderators can only see approved or their own versions

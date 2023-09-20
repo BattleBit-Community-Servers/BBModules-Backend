@@ -25,7 +25,7 @@ passport.use(new DiscordStrategy({
   clientID: process.env.CLIENT_ID,
   clientSecret: process.env.CLIENT_SECRET,
   callbackURL: process.env.CLIENT_REDIRECT,
-  scope: [ 'identify', 'email', 'guilds' ]
+  scope: [ 'identify', 'guilds' ]
 }, async (accessToken, refreshToken, profile, done) => {
   //console.log(profile)
   try {
@@ -55,7 +55,6 @@ passport.use(new DiscordStrategy({
     } else {
       const newUser = await prisma.users.create({
         data: {
-          User_email: profile.email,
           User_displayname: profile.username,
           User_discord_id: profile.id,
           User_discord_username: profile.username,

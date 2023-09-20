@@ -20,6 +20,11 @@ const authMiddleware = (auth, role) => {
 
 function ensureAuthenticated(req, res, next, role) {
   if (req.isAuthenticated()) {
+    if (req.user.User_is_banned) {
+      res.status(403).json({ message: 'Forbidden' });
+      return;
+    }
+
     if (!role || role.includes('') || role.includes(req.user.User_roles)) {
       return next();
     } else {

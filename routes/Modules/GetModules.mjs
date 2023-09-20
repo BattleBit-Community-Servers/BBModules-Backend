@@ -73,6 +73,18 @@ const GetModules = async (req, res) => {
       }
     };
 
+    const filter = req.query.filter || 'all';
+    if (filter == 'unapproved') {
+      modulesQuery.where = {
+        ...modulesQuery.where,
+        versions: {
+          some: {
+            Version_approved: false
+          }
+        }
+      };
+    }
+
     // By default, for cases not handled in the if statements below (eg. for admin, moderator), all modules are shown
 
     if (req.user && req.user.User_roles != 'ADMIN' && req.user.User_roles != 'MODERATOR') {

@@ -3,6 +3,7 @@ const func = async (req, res) => {
     // set cookie here
     if (req.isAuthenticated()) {
         const userData = {
+          User_discord_id: req.user.User_discord_id,
           User_displayname: req.user.User_displayname,
           User_roles: req.user.User_roles,
         };

@@ -5,7 +5,9 @@
   "main": "index.mjs",
   "type": "module",
   "scripts": {
-    "test": "nodemon"
+    "test": "nodemon",
+    "postinstall": "prisma generate",
+    "prisma": "prisma"
   },
   "repository": {
     "type": "git",
@@ -30,7 +32,12 @@
     "passport": "^0.6.0",
     "passport-discord": "^0.1.4",
     "prisma": "^5.2.0",
+    "rimraf": "^5.0.1",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.6.2",
+    "nodemon": "^3.0.1"
   }
 }

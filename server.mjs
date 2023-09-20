@@ -1,7 +1,5 @@
 // server.mjs
-
-import * as dotenv from 'dotenv';
-dotenv.config();
+import 'dotenv/config'
 
 // Express related
 import express from 'express';
@@ -33,7 +31,6 @@ const PORT = process.env.PORT || 2565;
 
 const startServer = async () => {
   try {
-
     // proxy & cors
     app.enable('trust proxy');
     app.use(cors({
@@ -41,8 +38,7 @@ const startServer = async () => {
       credentials: true,
     }));
 
-
-    app.use(express.json()); 
+    app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
     app.use(cookieParser());
 
@@ -62,7 +58,7 @@ const startServer = async () => {
     // Passport
     app.use(passport.initialize());
     app.use(passport.session());
-    
+
     // Files upload
     app.use(fileUpload());
 
@@ -72,7 +68,7 @@ const startServer = async () => {
 
     // Swagger docs
     app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-    
+
     app.use(express.static('public'));
     app.listen(PORT, () => {
       console.log(chalk.cyan(`Server is running on port ${PORT}`));
