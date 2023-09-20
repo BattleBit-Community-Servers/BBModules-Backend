@@ -3,7 +3,6 @@ import 'dotenv/config'
 
 // Express related
 import express from 'express';
-import bodyParser from 'body-parser';
 import session from 'express-session';
 import fileUpload from 'express-fileupload';
 import cors from 'cors';
