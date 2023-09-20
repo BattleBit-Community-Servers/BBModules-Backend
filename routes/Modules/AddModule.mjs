@@ -27,6 +27,11 @@ async function createDirectoryRecursively(directoryPath) {
 }
 
 const func = async (req, res) => {
+  if (req.user.User_is_locked) {
+    res.status(403).json({ message: 'Forbidden' });
+    return;
+  }
+
   if (!req.files.file.name.toLowerCase().endsWith('.cs')) {
     res.status(400).json({ message: 'Module extension is not .cs' });
     return;
