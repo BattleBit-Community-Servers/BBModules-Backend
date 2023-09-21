@@ -264,7 +264,7 @@ const func = async (req, res) => {
     }
   }
 
-  const modulePath = path.join(global.appRoot, "MODULES", module.Module_id.toString(), version.Version_v_number);
+  const modulePath = path.join(global.appRoot, "MODULES", module.Module_id.toString(), version.Version_id.toString());
   await createDirectoryRecursively(modulePath);
   const moduleFilePath = path.join(modulePath, verificationResult.Name + ".cs");
 
