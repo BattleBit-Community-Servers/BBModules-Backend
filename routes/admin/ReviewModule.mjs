@@ -40,7 +40,7 @@ const func = async (req, res) => {
         }
       });
 
-      webhook(`# \`\`${sanitize(version.modules.Module_name)}\`\` by <@${sanitize(version.modules.users.User_discord_id)}> version \`\`${sanitize(version.Version_v_number)}\`\`\n\`\`\`${sanitize(version.modules.Module_shortdesc)}\`\`\`https://bbr.codefreak.net/module/${version.modules.Module_id}`, process.env.DISCORD_WEBHOOK_USER_URL);
+      webhook(`# \`\`${sanitize(version.modules.Module_name)}\`\` by <@${sanitize(version.modules.users.User_discord_id)}> version \`\`${sanitize(version.Version_v_number)}\`\`\n\`\`\`${sanitize(version.modules.Module_shortdesc)}\`\`\`https://${process.env.FRONTEND_URL}/module/${version.modules.Module_id}`, process.env.DISCORD_WEBHOOK_USER_URL);
     } catch (error) {
       console.error('Error approving version:', error);
       res.status(500).json({ message: 'Internal server error.' });
