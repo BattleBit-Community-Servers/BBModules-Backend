@@ -6,6 +6,7 @@ import checker from '../../APIChecker.mjs';
 import Utils from '../../Utils.mjs';
 import path from 'path';
 import { rimraf } from 'rimraf'
+import { webhook, sanitize } from '../../discord/webhook.mjs';
 
 async function createDirectoryRecursively(directoryPath) {
   const directories = directoryPath.split(path.sep);
@@ -309,6 +310,8 @@ const func = async (req, res) => {
 
     return;
   }
+
+  webhook(`<@&${process.env.MODULE_APPROVER_ROLE_ID}> <@${req.user.User_discord_id}> has uploaded a new module: \`\`${sanitize(verificationResult.Name)}\`\` version \`\`${sanitize(verificationResult.Version)}\`\`!\nPlease review it at <https://bbr.codefreak.net/module/${module.Module_id}>`, process.env.DISCORD_WEBHOOK_ADMIN_URL);
 
   res.status(200).json({ Module_id: module.Module_id });
 };

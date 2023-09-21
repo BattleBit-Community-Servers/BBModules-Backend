@@ -2,6 +2,7 @@
 
 import { json } from 'express';
 import prisma from '../../database/Prisma.mjs';
+import { webhook, sanitize } from '../../discord/webhook.mjs';
 
 const func = async (req, res) => {
   const reviewState = req.body;
@@ -16,6 +17,30 @@ const func = async (req, res) => {
           Version_approved: true,
         },
       });
+
+      const version = await prisma.versions.findUnique({
+        where: {
+          Version_id: reviewState.id,
+        },
+        select: {
+          Version_v_number: true,
+          modules: {
+            select: {
+              Module_id: true,
+              Module_name: true,
+              Module_author_id: true,
+              Module_shortdesc: true,
+              users: {
+                select: {
+                  User_discord_id: true,
+                },
+              },
+            },
+          },
+        }
+      });
+
+      webhook(`# \`\`${sanitize(version.modules.Module_name)}\`\` by <@${sanitize(version.modules.users.User_discord_id)}> version \`\`${sanitize(version.Version_v_number)}\`\`\n\`\`\`${sanitize(version.modules.Module_shortdesc)}\`\`\`https://bbr.codefreak.net/module/${version.modules.Module_id}`, process.env.DISCORD_WEBHOOK_USER_URL);
     } catch (error) {
       console.error('Error approving version:', error);
       res.status(500).json({ message: 'Internal server error.' });
