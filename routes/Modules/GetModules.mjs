@@ -12,7 +12,7 @@ const metadata = {
 const GetModules = async (req, res) => {
   try {
     const page = parseInt(req.query.page || 1);
-    const pageSize = 6;
+    const pageSize = parseInt(process.env.MODULES_PER_PAGE || 12);
 
     const sort = req.query.sort || 'A-Z';
 
