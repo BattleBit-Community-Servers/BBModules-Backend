@@ -13,7 +13,7 @@ async function createDirectoryRecursively(directoryPath) {
 
   for (const directory of directories) {
     if (currentPath === '') {
-      currentPath = directory;
+      currentPath = directory || path.sep;
     } else {
       currentPath = path.join(currentPath, directory);
     }
