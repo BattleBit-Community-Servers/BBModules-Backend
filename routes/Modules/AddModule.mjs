@@ -116,6 +116,22 @@ const func = async (req, res) => {
       rimraf(uploadFolder);
       return;
     }
+
+    try {
+      await prisma.modules.update({
+        where: {
+          Module_id: module.Module_id,
+        },
+        data: {
+          Module_shortdesc: verificationResult.Description,
+        },
+      });
+    } catch (err) {
+      console.error('Error querying the database:', err);
+      res.status(500).json({ message: 'Unable to query database' });
+      rimraf(uploadFolder);
+      return;
+    }
   }
 
   const moduleDependencyNames = verificationResult.RequiredDependencies.concat(verificationResult.OptionalDependencies);
