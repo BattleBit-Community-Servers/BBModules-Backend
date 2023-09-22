@@ -2,7 +2,7 @@
 
 import { promises as fsPromises } from 'fs';
 import prisma from '../../database/Prisma.mjs';
-import { checkModuleFile } from '../../ModuleChecker.mjs';
+import checker from '../../APIChecker.mjs';
 import Utils from '../../Utils.mjs';
 import path from 'path';
 import { rimraf } from 'rimraf'
@@ -61,7 +61,7 @@ const func = async (req, res) => {
   //const { verificationOutput } = await spawnPromise(process.env.VERIFICATION_TOOL, [uploadPath]);
   let verificationResult;
   try {
-    verificationResult = await checkModuleFile(uploadPath);
+    verificationResult = await checker.check(uploadPath);
   } catch (err) {
     console.error('Error running the verification tool:', err);
     res.status(500).json({ message: 'Unable to run verification tool' });
