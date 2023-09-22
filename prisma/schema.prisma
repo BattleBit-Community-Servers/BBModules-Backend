@@ -15,7 +15,6 @@ model users {
   User_is_locked             Boolean?  @default(false)
   User_discord_id            String?   @unique(map: "User_discord_id") @db.VarChar(20)
   User_discord_username      String?   @db.VarChar(255)
-  User_discord_guilds        String?   @db.LongText
   User_discord_access_token  String?   @db.VarChar(255)
   User_discord_refresh_token String?   @db.VarChar(255)
   User_discord_issued_token  DateTime? @default(now()) @db.Timestamp(0)

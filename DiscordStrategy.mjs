@@ -71,7 +71,6 @@ passport.use(new DiscordStrategy({
           User_displayname: profile.username,
           User_discord_id: profile.id,
           User_discord_username: profile.username,
-          User_discord_guilds: JSON.stringify(profile.guilds),
           User_discord_access_token: accessToken,
           User_discord_refresh_token: refreshToken,
         },
