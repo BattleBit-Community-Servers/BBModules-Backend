@@ -48,6 +48,12 @@ const func = async (req, res) => {
     }
   } else {
     try {
+      await prisma.dependencies.deleteMany({
+        where: {
+          Dependency_version_id: reviewState.id,
+        }
+      });
+
       await prisma.versions.delete({
         where: {
           Version_id: reviewState.id,
