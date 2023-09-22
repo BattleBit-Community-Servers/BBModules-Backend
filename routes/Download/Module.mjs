@@ -91,9 +91,8 @@ const func = async (req, res) => {
     return;
   }
 
-  const fp = path.join(__dirname, basePath, version.Version_file_path);
-  console.log(fp);
-  res.download(fp, (err) => {
+  console.log(version.Version_file_path);
+  res.download(version.Version_file_path, (err) => {
     if (err) {
       console.error('Error downloading file:', err);
       res.status(404).json({ message: 'File not found' });
