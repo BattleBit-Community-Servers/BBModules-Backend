@@ -37,7 +37,7 @@ passport.use(new DiscordStrategy({
 
     // if user banned
     if (existingUser && existingUser.User_is_banned) {
-      return done("User is banned");
+      return done(new Error("User is banned"));
     }
 
     // if user not in guild
@@ -50,7 +50,7 @@ passport.use(new DiscordStrategy({
     });
 
     if (!inGuild) {
-      return done("User is not in the guild. Join https://discord.gg/FTkj9xUvHh and try again.");
+      return done(new Error("User is not in the guild. Join https://discord.gg/FTkj9xUvHh and try again."));
     }
 
     if (existingUser) {
