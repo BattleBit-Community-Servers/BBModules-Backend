@@ -9,7 +9,11 @@ const func = async (req, res) => {
   }
 };
 
-const type = "GET";
-const url = '/Template';
-const auth = false;
-export { func , type, url, auth };
+const metadata = {
+  type: 'GET',
+  url: '/template',
+  auth: false,
+  role: [''],
+};
+
+export { func, metadata };

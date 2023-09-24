@@ -3,8 +3,10 @@ import 'dotenv/config'
 
 // Express related
 import express from 'express';
-import bodyParser from 'body-parser';
 import session from 'express-session';
+import fileUpload from 'express-fileupload';
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
 
 // Discord Oauth
 import passport from 'passport';
@@ -13,37 +15,66 @@ import './DiscordStrategy.mjs'
 // Router
 import { WebsiteRouter, loadPages } from './routers/WebsiteRouter.mjs'; 
 
+// Prisma DB
 import prisma from './database/Prisma.mjs';
+
+// Swagger
+import swaggerUi from 'swagger-ui-express';
+import swaggerSpec from './swagger.mjs';
+
+// Chalk for beautiful term colors
+import chalk from 'chalk';
+
 
 const app = express();
 const PORT = process.env.PORT || 2565;
 
 const startServer = async () => {
   try {
-    app.use(express.json());
-    app.use(bodyParser.urlencoded({ extended: true }));
+    // proxy & cors
+    app.enable('trust proxy');
+    app.use(cors({
+      origin: process.env.FRONTEND_URL,
+      credentials: true,
+    }));
 
+    app.use(express.json());
+    app.use(express.urlencoded({ extended: true }));
+    app.use(cookieParser());
+
+    // Sessions
     app.use(session({
-      secret: "g6re-841z0/-re+0g8-8er",
-      resave: true,
+      secret: process.env.SESSION_SECRET,
+      resave: false,
       saveUninitialized: true,
+      store: new session.MemoryStore(),
       cookie: {
-        maxAge: 86400000 //process.env.COOKIE_MAXAGE glitches, can't detect it in .env
+        secure: true,   // HTTPS
+        httpOnly: true,
+        maxAge: parseInt(process.env.COOKIE_MAXAGE)
       }
     }));
+
+    // Passport
     app.use(passport.initialize());
     app.use(passport.session());
 
-    loadPages();
+    // Files upload
+    app.use(fileUpload());
+
+    // Pages router
+    await loadPages();
     app.use('/', WebsiteRouter);
 
+    // Swagger docs
+    app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
     app.use(express.static('public'));
-    
     app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
+      console.log(chalk.cyan(`Server is running on port ${PORT}`));
     });
   } catch (error) {
-    console.error('Error starting the server:', error);
+    console.error(chalk.red('Error starting the server:', error));
   }
 };
 

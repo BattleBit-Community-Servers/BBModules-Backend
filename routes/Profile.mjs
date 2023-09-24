@@ -8,7 +8,11 @@ const func = async (req, res) => {
   }
 };
 
-const type = "GET";
-const url = '/profile';
-const auth = true;
-export { func , type, url, auth };
+const metadata = {
+  type: 'GET',
+  url: '/profile',
+  auth: true,
+  role: [''],
+};
+
+export { func, metadata };

@@ -1,2 +1,12 @@
 node_modules/
+
 .env
+*.aa
+testBack.mjs
+
+APIChecker/
+/MODULES/
+/TEMP
+/cache
+/.vscode
+/.idea

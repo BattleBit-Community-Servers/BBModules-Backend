@@ -1,3 +1,5 @@
+// Discord.mjs
+
 import path from 'path';
 import { fileURLToPath } from 'url';
 import passport from 'passport';
@@ -8,8 +10,24 @@ const __dirname = path.dirname(__filename);
 
 const func = passport.authenticate('discord');
 
-const type = "GET";
-const url = "/discord";
-const auth = false;
+const metadata = {
+  type: 'GET',
+  url: '/discord',
+  auth: false,
+  role: [''],
+};
 
-export {func , type, url, auth };
+export { func, metadata };
+
+/**
+ * @swagger
+ * /auth/discord:
+ *   get:
+ *     tags: 
+ *      - auth
+ *     summary: Redirects to discord auth page, with the right parameters
+ *     description: Allow the user to log-in via discord Oauth
+ *     responses:
+ *       302:
+ *         description: Header Location
+ */

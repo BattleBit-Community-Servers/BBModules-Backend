@@ -5,7 +5,9 @@
   "main": "index.mjs",
   "type": "module",
   "scripts": {
-    "test": "nodemon"
+    "test": "nodemon",
+    "postinstall": "prisma generate",
+    "prisma": "prisma"
   },
   "repository": {
     "type": "git",
@@ -19,12 +21,24 @@
   "homepage": "https://github.com/BattleBit-Community-Servers/BBModules-Backend#readme",
   "dependencies": {
     "@prisma/client": "^5.2.0",
+    "axios": "^1.5.0",
+    "chalk": "^5.3.0",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
+    "express-fileupload": "^1.4.0",
+    "express-form-data": "^2.0.22",
     "express-session": "^1.17.3",
-    "mysql2": "^3.6.0",
     "passport": "^0.6.0",
     "passport-discord": "^0.1.4",
-    "prisma": "^5.2.0"
+    "prisma": "^5.2.0",
+    "rimraf": "^5.0.1",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.6.2",
+    "nodemon": "^3.0.1"
   }
 }
