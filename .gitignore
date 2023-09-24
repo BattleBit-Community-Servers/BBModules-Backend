@@ -6,5 +6,7 @@ testBack.mjs
 
 APIChecker/
 /MODULES/
+/TEMP
 /cache
-.vscode
+/.vscode
+/.idea
