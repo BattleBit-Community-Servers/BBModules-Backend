@@ -311,7 +311,7 @@ const func = async (req, res) => {
     return;
   }
 
-  webhook(`<@&${process.env.MODULE_APPROVER_ROLE_ID}> <@${req.user.User_discord_id}> has uploaded a new module: \`\`${sanitize(verificationResult.Name)}\`\` version \`\`${sanitize(verificationResult.Version)}\`\`!\nPlease review it at <https://${process.env.FRONTEND_URL}/module/${module.Module_id}>`, process.env.DISCORD_WEBHOOK_ADMIN_URL);
+  webhook(`<@&${process.env.MODULE_APPROVER_ROLE_ID}> <@${req.user.User_discord_id}> has uploaded a new module: \`\`${sanitize(verificationResult.Name)}\`\` version \`\`${sanitize(verificationResult.Version)}\`\`!\nPlease review it at <${process.env.FRONTEND_URL}/module/${module.Module_id}>`, process.env.DISCORD_WEBHOOK_ADMIN_URL);
 
   res.status(200).json({ Module_id: module.Module_id });
 };
