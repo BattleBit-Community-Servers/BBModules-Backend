@@ -2,11 +2,11 @@
 
 import { promises as fsPromises } from 'fs';
 import prisma from '../../database/Prisma.mjs';
-import checker from '../../APIChecker.mjs';
 import Utils from '../../Utils.mjs';
 import path from 'path';
 import { rimraf } from 'rimraf'
 import { webhook, sanitize } from '../../discord/webhook.mjs';
+import { checkModuleFile } from "../../ModuleChecker.mjs";
 
 async function createDirectoryRecursively(directoryPath) {
   const directories = directoryPath.split(path.sep);
@@ -58,10 +58,9 @@ const func = async (req, res) => {
     return;
   }
 
-  //const { verificationOutput } = await spawnPromise(process.env.VERIFICATION_TOOL, [uploadPath]);
   let verificationResult;
   try {
-    verificationResult = await checker.check(uploadPath);
+    verificationResult = await checkModuleFile(uploadPath);
   } catch (err) {
     console.error('Error running the verification tool:', err);
     res.status(500).json({ message: 'Unable to run verification tool' });
