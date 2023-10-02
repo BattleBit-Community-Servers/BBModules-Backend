@@ -4,16 +4,7 @@ import prisma from '../../database/Prisma.mjs';
 
 const func = async (req, res) => {
   try {
-    const id = parseInt(req.params.id);
-
-    if (isNaN(id)) {
-      return res.status(400).json({ message: 'Invalid ID parameter. Must be a number.' });
-    }
-
-    const module = await prisma.modules.findFirst({
-      where: {
-        Module_id: id,
-      },
+    let searchQuery = {
       include: {
         users: {
           select: {
@@ -45,7 +36,27 @@ const func = async (req, res) => {
           },
         },
       },
-    });
+    };
+
+    const id = parseInt(req.params.id);
+
+    if (isNaN(id)) {
+      searchQuery = {
+        ...searchQuery,
+        where: {
+          Module_name: req.params.id,
+        },
+      };
+    } else {
+      searchQuery = {
+        ...searchQuery,
+        where: {
+          Module_id: id,
+        },
+      };
+    }
+
+    const module = await prisma.modules.findFirst(searchQuery);
     if (!module) {
       return res.status(404).json({ message: 'Module not found.' });
     }
